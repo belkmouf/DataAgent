@@ -262,3 +262,69 @@ CREATE TABLE IF NOT EXISTS `model_config` (
   `is_deleted` int(11) DEFAULT '0' COMMENT '0=未删除, 1=已删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 知识图谱节点表
+CREATE TABLE IF NOT EXISTS `knowledge_graph_node` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '节点唯一ID',
+  `agent_id` INT NOT NULL COMMENT '关联的智能体ID',
+  `node_type` VARCHAR(100) NOT NULL COMMENT '节点类型 (如: Entity实体, Concept概念, Table表, Column字段等)',
+  `node_name` VARCHAR(255) NOT NULL COMMENT '节点名称',
+  `display_name` VARCHAR(255) COMMENT '显示名称 (用于UI展示)',
+  `description` TEXT COMMENT '节点描述',
+  `properties` JSON COMMENT '节点属性 (JSON格式，存储额外的键值对)',
+  `embedding_status` VARCHAR(20) DEFAULT 'PENDING' COMMENT '向量化状态：PENDING待处理，PROCESSING处理中，COMPLETED已完成，FAILED失败',
+  `error_msg` VARCHAR(255) DEFAULT NULL COMMENT '操作失败的错误信息',
+  `is_deleted` TINYINT DEFAULT 0 COMMENT '逻辑删除：0-未删除，1-已删除',
+  `created_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  INDEX `idx_agent_id` (`agent_id`),
+  INDEX `idx_node_type` (`node_type`),
+  INDEX `idx_node_name` (`node_name`),
+  INDEX `idx_embedding_status` (`embedding_status`),
+  INDEX `idx_is_deleted` (`is_deleted`),
+  FOREIGN KEY (`agent_id`) REFERENCES `agent`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='知识图谱节点表';
+
+-- 知识图谱边表 (关系)
+CREATE TABLE IF NOT EXISTS `knowledge_graph_edge` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '边唯一ID',
+  `agent_id` INT NOT NULL COMMENT '关联的智能体ID',
+  `source_node_id` BIGINT NOT NULL COMMENT '源节点ID',
+  `target_node_id` BIGINT NOT NULL COMMENT '目标节点ID',
+  `edge_type` VARCHAR(100) NOT NULL COMMENT '边类型 (如: hasAttribute有属性, relatesTo相关, isA是一个, contains包含等)',
+  `edge_name` VARCHAR(255) COMMENT '边名称/标签',
+  `description` TEXT COMMENT '关系描述',
+  `weight` DECIMAL(5,4) DEFAULT 1.0000 COMMENT '边权重 (用于图算法，默认1.0)',
+  `properties` JSON COMMENT '边属性 (JSON格式)',
+  `is_deleted` TINYINT DEFAULT 0 COMMENT '逻辑删除：0-未删除，1-已删除',
+  `created_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  INDEX `idx_agent_id` (`agent_id`),
+  INDEX `idx_source_node_id` (`source_node_id`),
+  INDEX `idx_target_node_id` (`target_node_id`),
+  INDEX `idx_edge_type` (`edge_type`),
+  INDEX `idx_is_deleted` (`is_deleted`),
+  INDEX `idx_source_target` (`source_node_id`, `target_node_id`),
+  FOREIGN KEY (`agent_id`) REFERENCES `agent`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`source_node_id`) REFERENCES `knowledge_graph_node`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`target_node_id`) REFERENCES `knowledge_graph_node`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='知识图谱边表(关系)';
+
+-- 知识图谱查询历史表 (可选，用于优化和分析)
+CREATE TABLE IF NOT EXISTS `knowledge_graph_query_log` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '日志ID',
+  `agent_id` INT NOT NULL COMMENT '关联的智能体ID',
+  `query_text` TEXT NOT NULL COMMENT '原始查询文本',
+  `matched_nodes` JSON COMMENT '匹配到的节点ID列表',
+  `matched_edges` JSON COMMENT '匹配到的边ID列表',
+  `query_type` VARCHAR(50) COMMENT '查询类型 (如: node_search, path_finding, subgraph等)',
+  `execution_time_ms` INT COMMENT '执行时间(毫秒)',
+  `created_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '查询时间',
+  PRIMARY KEY (`id`),
+  INDEX `idx_agent_id` (`agent_id`),
+  INDEX `idx_query_type` (`query_type`),
+  INDEX `idx_created_time` (`created_time`),
+  FOREIGN KEY (`agent_id`) REFERENCES `agent`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='知识图谱查询历史表';
