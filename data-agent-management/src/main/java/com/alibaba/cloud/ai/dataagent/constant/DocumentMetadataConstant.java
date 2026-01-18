@@ -52,4 +52,10 @@ public final class DocumentMetadataConstant {
 	// businessTermId
 	public static final String DB_BUSINESS_TERM_ID = "businessTermId";
 
+	// Knowledge Graph
+	public static final String KNOWLEDGE_GRAPH = "knowledgeGraph";
+
+	// Knowledge Graph Node ID
+	public static final String DB_KG_NODE_ID = "kgNodeId";
+
 }
