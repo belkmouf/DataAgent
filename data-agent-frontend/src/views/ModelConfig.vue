@@ -193,6 +193,8 @@
               <el-option label="DeepSeek" value="deepseek" />
               <el-option label="Qwen" value="qwen" />
               <el-option label="OpenAI" value="openai" />
+              <el-option label="Anthropic (Claude)" value="anthropic" />
+              <el-option label="Google Gemini" value="gemini" />
               <el-option label="Siliconflow" value="siliconflow" />
               <el-option label="Custom" value="custom" />
             </el-select>
@@ -330,6 +332,8 @@
         deepseek: 'https://api.deepseek.com',
         qwen: 'https://dashscope.aliyuncs.com/compatible-mode',
         openai: 'https://api.openai.com',
+        anthropic: 'https://api.anthropic.com',
+        gemini: 'https://us-central1-aiplatform.googleapis.com/v1/projects/YOUR_PROJECT_ID/locations/us-central1',
         siliconflow: 'https://api.siliconflow.cn',
         custom: '', // 自定义提供商不设置默认API地址
       };
@@ -538,7 +542,9 @@
           deepseek: 'success',
           qwen: 'warning',
           openai: 'primary',
-          siliconflow: 'danger',
+          anthropic: 'danger',
+          gemini: 'warning',
+          siliconflow: 'info',
           custom: 'info',
         };
         return typeMap[provider] || 'info';
