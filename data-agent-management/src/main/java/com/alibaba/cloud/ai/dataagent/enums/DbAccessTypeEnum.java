@@ -30,7 +30,9 @@ public enum DbAccessTypeEnum {
 
 	FC_HTTP("fc-http"),
 
-	MEMORY("in-memory");
+	MEMORY("in-memory"),
+
+	API("api");
 
 	private String code;
 

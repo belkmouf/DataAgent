@@ -50,7 +50,12 @@ public enum BizDataSourceTypeEnum {
 	MYSQL_VIRTUAL(51, "mysql-virtual", DatabaseDialectEnum.MYSQL.getCode(), DbAccessTypeEnum.MEMORY.getCode()),
 
 	POSTGRESQL_VIRTUAL(52, "postgresql-virtual", DatabaseDialectEnum.POSTGRESQL.getCode(),
-			DbAccessTypeEnum.MEMORY.getCode());
+			DbAccessTypeEnum.MEMORY.getCode()),
+
+	/**
+	 * YouTube API data source
+	 */
+	YOUTUBE(100, "youtube", DatabaseDialectEnum.YOUTUBE.getCode(), DbAccessTypeEnum.API.getCode());
 
 	public final Integer code;
 
